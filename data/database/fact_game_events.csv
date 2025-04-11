@@ -439,3 +439,22 @@ e1cce9d9-8c7e-46e7-b50d-3f87c002caae,1,Agent_8,Weapons,False,True,No Ejection,No
 29dbcc0f-50e5-4d50-8a39-d0aa752bd24b,2,Agent_4,MedBay,False,True,Agent_7,Agent_7,True,0,True,0.8333333333333334
 29dbcc0f-50e5-4d50-8a39-d0aa752bd24b,2,Agent_5,O2,False,True,Agent_7,Agent_7,True,0,True,0.8333333333333334
 29dbcc0f-50e5-4d50-8a39-d0aa752bd24b,2,Agent_6,Cafeteria,False,True,Agent_7,Agent_7,True,0,True,0.8333333333333334
+d238e7ed-8f8e-420a-a812-ae0680112a79,2,Agent_2,O2,False,True,Agent_5,Agent_5,True,0,True,0.8571428571428571
+d238e7ed-8f8e-420a-a812-ae0680112a79,2,Agent_3,O2,False,True,Agent_5,Agent_5,True,0,True,0.8571428571428571
+d238e7ed-8f8e-420a-a812-ae0680112a79,2,Agent_4,MedBay,False,True,Agent_5,Agent_5,True,0,True,0.8571428571428571
+d238e7ed-8f8e-420a-a812-ae0680112a79,2,Agent_6,Upper Engine,False,True,Agent_5,Agent_5,True,0,True,0.8571428571428571
+d238e7ed-8f8e-420a-a812-ae0680112a79,2,Agent_7,Lower Engine,False,True,Agent_5,Agent_5,True,0,True,0.8571428571428571
+d238e7ed-8f8e-420a-a812-ae0680112a79,2,Agent_8,Shields,False,True,Agent_5,Agent_5,True,0,True,0.8571428571428571
+5a550f33-e90d-42a3-818f-b4d20098218f,2,Agent_2,Weapons,False,True,No Ejection,No Ejection,True,0,True,1.0
+5a550f33-e90d-42a3-818f-b4d20098218f,2,Agent_3,Electrical,False,True,No Ejection,No Ejection,True,0,True,1.0
+5a550f33-e90d-42a3-818f-b4d20098218f,2,Agent_4,O2,False,True,No Ejection,No Ejection,True,0,True,1.0
+5a550f33-e90d-42a3-818f-b4d20098218f,2,Agent_5,Shields,False,True,No Ejection,No Ejection,True,0,True,1.0
+5a550f33-e90d-42a3-818f-b4d20098218f,2,Agent_6,O2,False,True,No Ejection,No Ejection,True,0,True,1.0
+5a550f33-e90d-42a3-818f-b4d20098218f,2,Agent_7,Navigation,False,True,No Ejection,No Ejection,True,0,True,1.0
+5a550f33-e90d-42a3-818f-b4d20098218f,2,Agent_8,Reactor,False,True,No Ejection,No Ejection,True,0,True,1.0
+5a550f33-e90d-42a3-818f-b4d20098218f,3,Agent_2,Weapons,False,True,Agent_6,Agent_6,True,0,True,0.8571428571428571
+5a550f33-e90d-42a3-818f-b4d20098218f,3,Agent_3,Electrical,False,True,Agent_6,Agent_6,True,0,True,0.8571428571428571
+5a550f33-e90d-42a3-818f-b4d20098218f,3,Agent_4,O2,False,True,Agent_6,Agent_6,True,0,True,0.8571428571428571
+5a550f33-e90d-42a3-818f-b4d20098218f,3,Agent_5,Shields,False,True,Agent_6,Agent_6,True,0,True,0.8571428571428571
+5a550f33-e90d-42a3-818f-b4d20098218f,3,Agent_7,Navigation,False,True,Agent_6,Agent_6,True,0,True,0.8571428571428571
+5a550f33-e90d-42a3-818f-b4d20098218f,3,Agent_8,Reactor,False,True,Agent_6,Agent_6,True,0,True,0.8571428571428571
