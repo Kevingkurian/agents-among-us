@@ -510,3 +510,8 @@ d67faf24-6ea3-4f7f-b419-13e5644b56d3,5,Agent_4,Shields,False,True,Agent_5,Agent_
 8345e8e7-20c2-48bb-8bd7-f0f6fedc5939,1,Agent_4,Shields,False,True,Agent_6,Agent_6,True,0,True,0.7142857142857143,2025-04-13T19:03:19.106206
 8345e8e7-20c2-48bb-8bd7-f0f6fedc5939,1,Agent_7,Electrical,False,True,Agent_6,Agent_6,True,0,True,0.7142857142857143,2025-04-13T19:03:19.106206
 8345e8e7-20c2-48bb-8bd7-f0f6fedc5939,1,Agent_8,Communications,False,True,Agent_6,Agent_6,True,0,True,0.7142857142857143,2025-04-13T19:03:19.106206
+ad28f168-50a0-450e-8aef-807e8a0506c9,1,Agent_2,Storage,False,True,Agent_4,Agent_4,True,0,True,0.6666666666666666,2025-04-13T19:44:24.807119
+ad28f168-50a0-450e-8aef-807e8a0506c9,1,Agent_5,Navigation,False,True,Agent_4,Agent_4,True,0,True,0.6666666666666666,2025-04-13T19:44:24.807119
+ad28f168-50a0-450e-8aef-807e8a0506c9,1,Agent_6,Shields,False,True,Agent_4,Agent_4,True,0,True,0.6666666666666666,2025-04-13T19:44:24.807629
+ad28f168-50a0-450e-8aef-807e8a0506c9,1,Agent_7,O2,False,True,Agent_4,Agent_4,True,0,True,0.6666666666666666,2025-04-13T19:44:24.807629
+ad28f168-50a0-450e-8aef-807e8a0506c9,1,Agent_8,O2,False,True,Agent_7,Agent_4,False,0,True,0.6666666666666666,2025-04-13T19:44:24.807629

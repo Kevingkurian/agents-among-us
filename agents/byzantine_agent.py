@@ -20,6 +20,8 @@ class ByzantineAgent:
         self.color = color
         self.model_name = model_name
         self.agents_state = agents_state
+        self.byzn_team = [agent for agent, data in agents_state.items()
+                          if data["role"] == "byzantine" and agent != name]
 
         self.chain = (
             PromptTemplate(
@@ -176,9 +178,8 @@ class ByzantineAgent:
     def vote_for_ejection(self):
         alive_targets = [
             a for a in self.agents_state
-            if not self.agents_state[a].get("killed", False) and a != self.name
+            if not self.agents_state[a].get("killed", False) and a != self.name and a not in self.byzn_team
         ]
-
         messages = []
         for agent, data in self.agents_state.items():
             msgs = data.get("messages", [])
@@ -195,21 +196,23 @@ class ByzantineAgent:
 
         alive_str = ", ".join(alive_targets)
         prompt = f"""
-    You are a byzantine agent attempting to avoid suspicion in a deception-detection game.
+        You are a byzantine agent attempting to avoid suspicion in a deception-detection game.
 
-    Recent messages:
-    {history}
+        Do NOT vote to eject your fellow byzantine agents: {', '.join(self.byzn_team)}
 
-    Your perception history:
-    {seen_history_str}
+        Recent messages:
+        {history}
 
-    You must vote to eject one agent from the following ACTIVE agents:
-    {alive_str}
+        Your perception history:
+        {seen_history_str}
 
-    Only choose ONE name from this list, or say "No Ejection" if no one stands out.
+        You must vote to eject one agent from the following ACTIVE agents:
+        {', '.join(alive_targets)}
 
-    ONLY return the agent name from the list above or "No Ejection". Do not explain.
-    """
+        Only choose ONE name from this list, or say "No Ejection" if no one stands out.
+
+        ONLY return the agent name from the list above or "No Ejection". Do not explain.
+        """
 
         response = llm(prompt)["choices"][0]["message"]["content"].strip().splitlines()[0]
 

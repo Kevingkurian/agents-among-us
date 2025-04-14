@@ -687,3 +687,11 @@ bc58d25e-649d-420a-a94e-fdc61addbbe5,Agent_5,byzantine,gpt-4-turbo,🟠,2025-04-
 bc58d25e-649d-420a-a94e-fdc61addbbe5,Agent_6,byzantine,gpt-4o,🟡,2025-04-13T19:37:53.969987
 bc58d25e-649d-420a-a94e-fdc61addbbe5,Agent_7,honest,gpt-4-turbo,⚫,2025-04-13T19:37:53.969987
 bc58d25e-649d-420a-a94e-fdc61addbbe5,Agent_8,honest,gpt-4,⚪,2025-04-13T19:37:53.970488
+ad28f168-50a0-450e-8aef-807e8a0506c9,Agent_1,honest,gpt-4o,🔴,2025-04-13T19:44:01.977815
+ad28f168-50a0-450e-8aef-807e8a0506c9,Agent_2,honest,gpt-4,🔵,2025-04-13T19:44:01.978315
+ad28f168-50a0-450e-8aef-807e8a0506c9,Agent_3,honest,claude-3-opus-20240229,🟢,2025-04-13T19:44:01.978315
+ad28f168-50a0-450e-8aef-807e8a0506c9,Agent_4,honest,claude-3-haiku-20240307,💗,2025-04-13T19:44:01.978315
+ad28f168-50a0-450e-8aef-807e8a0506c9,Agent_5,byzantine,gpt-4-turbo,🟠,2025-04-13T19:44:01.978816
+ad28f168-50a0-450e-8aef-807e8a0506c9,Agent_6,honest,gpt-4o,🟡,2025-04-13T19:44:01.978816
+ad28f168-50a0-450e-8aef-807e8a0506c9,Agent_7,byzantine,gpt-4-turbo,⚫,2025-04-13T19:44:01.978816
+ad28f168-50a0-450e-8aef-807e8a0506c9,Agent_8,honest,gpt-4,⚪,2025-04-13T19:44:01.979315
