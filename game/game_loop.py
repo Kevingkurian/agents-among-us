@@ -208,7 +208,7 @@ def run_game_round(game_id, step, state, agents, agents_state, stream):
         agreement_level = vote_counts[ejected] / len(votes)
 
         if ejected in agents_state:
-            correct = (not state[ejected]["killed"] and agents_state[ejected]["role"] == "byzantine")
+            correct = (agents_state[ejected]["role"] == "byzantine")
             print(f"\nEjected: {ejected}")
             print(f"Vote {'correct' if correct else 'incorrect'} — Role was: {agents_state[ejected]['role']}")
             print(f"Consensus Agreement Level: {agreement_level:.2f}")
