@@ -3,7 +3,7 @@ import os
 import time
 from uuid import uuid4
 from flask import Flask, Response, render_template, stream_with_context, jsonify
-from core.simulation import setup_game, get_current_state
+from core.simulation import setup_game, get_current_state, _current_game
 from game.game_loop import run_game_round, finalize_log, generate_map_html, generate_agent_status_html
 
 app = Flask(__name__)
@@ -43,7 +43,11 @@ def run():
 
         game_id = str(uuid4())
         active_game_id = game_id
-        agents, agents_state, state = setup_game(game_id)
+        if not _current_game.get("state"):
+            agents, agents_state, state = setup_game(game_id)
+        else:
+            agents, state = get_current_state()
+            agents_state = {a.name: a.agents_state[a.name] for a in agents}
 
         try:
             for round_num in range(1, 6):

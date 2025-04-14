@@ -44,6 +44,8 @@ def show_ship_map(state, agents):
     mapping = {room: [] for room in rooms}
     bodies = {room: [] for room in rooms}
     for agent, info in state.items():
+        if not isinstance(info, dict):
+            continue
         if not info.get("killed", False):
             agent_obj = next((a for a in agents if a.name == agent), None)
             mapping[info["room"]].append(f"{agent_obj.color}{agent}" if agent_obj else agent)
@@ -71,6 +73,9 @@ def show_ship_map(state, agents):
             print(f"{room}: {' '.join(occupants)}")
 
 def movement_phase(state, agents, agents_state, stream):
+    if "_reported_bodies" not in state:
+        state["_reported_bodies"] = set()
+
     for agent in agents:
         if state[agent.name]["killed"]:
             continue
@@ -101,9 +106,18 @@ def movement_phase(state, agents, agents_state, stream):
                 print(f"{agent.name} moved from {current} to {dest}")
             yield from stream.flush()
 
-        seen = [a for a in state if state[a]["room"] == dest and a != agent.name and not state[a]["killed"]]
+        seen = [
+            a for a, info in state.items()
+            if isinstance(info, dict) and info.get("room") == dest and a != agent.name and not info.get("killed", False)
+        ]
         room = state[agent.name]["room"]
-        seen_bodies = [a for a in state if state[a].get("killed") and state[a].get("room_body") == room]
+        seen_bodies = [
+            a for a, info in state.items()
+            if isinstance(info, dict)
+               and info.get("killed")
+               and info.get("room_body") == room
+               and a not in state["_reported_bodies"]
+        ]
         state[agent.name]["perception"].append({
             "room": room,
             "agents_seen": seen,
@@ -112,9 +126,11 @@ def movement_phase(state, agents, agents_state, stream):
 
         if seen_bodies and not state[agent.name]["killed"]:
             if agent.__class__.__name__ == "HonestAgent":
-                agent_msg = f"I just found the body of {seen_bodies[0]} in {room}! Reporting it now!"
+                body_to_report = seen_bodies[0]
+                agent_msg = f"I just found the body of {body_to_report} in {room}! Reporting it now!"
                 print(f"{agent.name} reports: {agent_msg}")
                 agents_state[agent.name]["messages"].append(agent_msg)
+                state["_reported_bodies"].add(body_to_report)
                 yield from stream.flush()
 
         if agent.__class__.__name__ == "HonestAgent":
@@ -136,17 +152,18 @@ def run_game_round(game_id, step, state, agents, agents_state, stream):
     show_ship_map(state, agents)
     yield from stream.flush()
 
-    alive = sum(1 for a in state.values() if not a["killed"])
-    dead = sum(1 for a in state.values() if a["killed"])
+    alive = sum(1 for a in state.values() if isinstance(a, dict) and not a.get("killed", False))
+    dead = sum(1 for a in state.values() if isinstance(a, dict) and a.get("killed", False))
     log_round_metadata(game_id, step, alive, dead)
 
     messages = {}
 
     any_body_seen = any(
-        agent_state["perception"]
+        isinstance(agent_state, dict)
+        and agent_state.get("perception")
         and len(agent_state["perception"][-1].get("bodies_seen", [])) > 0
+        and not agent_state.get("killed", False)
         for agent_state in state.values()
-        if not agent_state["killed"]
     )
 
     if any_body_seen:
@@ -230,6 +247,8 @@ def generate_map_html(state=None, agents=None):
     bodies = {room: [] for room in rooms}
     if state and agents:
         for agent, info in state.items():
+            if not isinstance(info, dict):
+                continue
             if not info.get("killed", False):
                 agent_obj = next((a for a in agents if a.name == agent), None)
                 mapping[info["room"]].append(f"{agent_obj.color}{agent}" if agent_obj else agent)

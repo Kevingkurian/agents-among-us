@@ -127,13 +127,13 @@ class ByzantineAgent:
 
     def choose_room(self, current_room, adjacent_rooms, full_state):
         nearby = {
-            room: [agent for agent, info in full_state.items() if info["room"] == room]
+            room: [agent for agent, info in full_state.items() if isinstance(info, dict) and info.get("room") == room]
             for room in adjacent_rooms
         }
 
         nearby_str = "\n".join(f"{room}: {', '.join(agents) if agents else 'empty'}" for room, agents in nearby.items())
 
-        current_room_agents = [agent for agent, info in full_state.items() if info["room"] == current_room]
+        current_room_agents = [agent for agent, info in full_state.items() if isinstance(info, dict) and info.get("room") == current_room]
         current_room_str = f"Current Room ({current_room}): {', '.join(current_room_agents)}"
 
         agent_role = "Byzantine" if self.agents_state[self.name]["role"] == "byzantine" else "Honest"

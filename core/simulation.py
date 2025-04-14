@@ -6,7 +6,6 @@ import random
 NUM_ROUNDS = 5
 _current_game = {}
 
-
 def setup_game(game_id):
     agents, agents_state = create_agents(game_id)
     all_rooms = list(rooms.keys())
@@ -22,14 +21,16 @@ def setup_game(game_id):
             "doing_task": False
         } for agent in agents
     }
-    alive = sum(1 for v in state.values() if not v["killed"])
-    dead = sum(1 for v in state.values() if v["killed"])
+
+    state["_reported_bodies"] = set()
+
+    alive = sum(1 for v in state.values() if isinstance(v, dict) and not v.get("killed", False))
+    dead = sum(1 for v in state.values() if isinstance(v, dict) and v.get("killed", False))
     log_round_metadata(game_id, 0, alive, dead)
 
     _current_game["state"] = state
     _current_game["agents"] = agents
     return agents, agents_state, state
-
 
 def get_current_state():
     return _current_game.get("agents", []), _current_game.get("state", {})
