@@ -2,7 +2,7 @@ import sys
 import os
 import time
 from uuid import uuid4
-from flask import Flask, Response, render_template, stream_with_context, jsonify
+from flask import Flask, Response, render_template, stream_with_context, jsonify, request
 from core.simulation import setup_game, get_current_state, _current_game
 from game.game_loop import run_game_round, finalize_log, generate_map_html, generate_agent_status_html
 
@@ -34,6 +34,7 @@ def index():
 
 @app.route("/run")
 def run():
+    selected_model = request.args.get("model", "All")
     @stream_with_context
     def generate():
         global active_game_id
@@ -43,28 +44,19 @@ def run():
 
         game_id = str(uuid4())
         active_game_id = game_id
-        if not _current_game.get("state"):
-            agents, agents_state, state = setup_game(game_id)
-        else:
-            agents, state = get_current_state()
-            agents_state = {a.name: a.agents_state[a.name] for a in agents}
+        agents, agents_state, state = setup_game(game_id, selected_model)
 
         try:
             for round_num in range(1, 6):
                 print(f"--- Round {round_num} ---")
                 yield from stream.flush()
-
                 yield from run_game_round(game_id, round_num, state, agents, agents_state, stream)
-
                 time.sleep(0.25)
-
             finalize_log()
             print(f"✔ Simulation complete for game_id: {game_id}")
             yield from stream.flush()
-
         finally:
             sys.stdout = original_stdout
-
         yield "data: [DONE]\n\n"
 
     return Response(generate(), mimetype='text/event-stream')

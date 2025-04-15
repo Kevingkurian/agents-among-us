@@ -60,6 +60,18 @@
     <div id="map-container">
         <h1>ByzantineBrains Simulation</h1>
         <button onclick="start()">▶ Run Simulation</button>
+        <div style="margin-top: 1em;">
+            <label for="model-select">select model(s):</label>
+            <select id="model-select">
+                <option value="All">All (Random)</option>
+                <option value="gpt-4o">GPT-4o</option>
+                <option value="gpt-4">GPT-4</option>
+                <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                <option value="claude-3-opus-20240229">Claude-3 Opus</option>
+                <option value="claude-3-haiku-20240307">Claude-3 Haiku</option>
+                <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+            </select>
+        </div>
         <div id="map-title">Ship Map</div>
         <div id="map">{{ map_html|safe }}</div>
         <div id="agent-status"></div>
@@ -68,19 +80,20 @@
         <div id="output"></div>
     </div>
     <script>
-        function start() {
-            const out = document.getElementById("output");
-            out.innerHTML = "";
-            const source = new EventSource("/run");
-            source.onmessage = function(event) {
-                if (event.data === "[DONE]") {
-                    source.close();
-                    return;
-                }
-                out.textContent += event.data + "\n";
-                out.scrollTop = out.scrollHeight;
-            };
+function start() {
+    const out = document.getElementById("output");
+    out.innerHTML = "";
+    const model = document.getElementById("model-select").value;
+    const source = new EventSource(`/run?model=${model}`);
+    source.onmessage = function(event) {
+        if (event.data === "[DONE]") {
+            source.close();
+            return;
         }
+        out.textContent += event.data + "\n";
+        out.scrollTop = out.scrollHeight;
+    };
+}
 
         setInterval(() => {
             fetch("/map")
