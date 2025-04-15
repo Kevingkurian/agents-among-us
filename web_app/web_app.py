@@ -4,6 +4,7 @@ import time
 from uuid import uuid4
 from flask import Flask, Response, render_template, stream_with_context, jsonify, request
 from core.simulation import setup_game, get_current_state, _current_game
+from config.settings import NUM_ROUNDS
 from game.game_loop import run_game_round, finalize_log, generate_map_html, generate_agent_status_html
 
 app = Flask(__name__)
@@ -41,16 +42,20 @@ def run():
         stream = RealTimeStream()
         original_stdout = sys.stdout
         sys.stdout = stream
-
         game_id = str(uuid4())
         active_game_id = game_id
         agents, agents_state, state = setup_game(game_id, selected_model)
-
+        round_num = 1
         try:
-            for round_num in range(1, 6):
+            while round_num <= NUM_ROUNDS:
                 print(f"--- Round {round_num} ---")
                 yield from stream.flush()
                 yield from run_game_round(game_id, round_num, state, agents, agents_state, stream)
+                alive_byzantines = [a for a in agents if agents_state[a.name]["role"] == "byzantine" and not state[a.name]["killed"]]
+                alive_honest = [a for a in agents if agents_state[a.name]["role"] == "honest" and not state[a.name]["killed"]]
+                if not alive_byzantines or len(alive_byzantines) >= len(alive_honest):
+                    break
+                round_num += 1
                 time.sleep(0.25)
             finalize_log()
             print(f"✔ Simulation complete for game_id: {game_id}")

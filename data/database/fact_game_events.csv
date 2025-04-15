@@ -589,3 +589,10 @@ f9c97f93-a7d1-4773-a61b-eb7a2352a883,5,Agent_7,Reactor,False,True,Agent_8,Agent_
 5b6247e3-93a0-4a77-b82d-39b2ea5155e0,5,Agent_4,MedBay,False,True,Agent_5,Agent_5,True,0,True,0.6666666666666666,2025-04-14T13:37:37.670130
 5b6247e3-93a0-4a77-b82d-39b2ea5155e0,5,Agent_6,O2,False,True,Agent_5,Agent_5,True,0,True,0.6666666666666666,2025-04-14T13:37:37.670130
 5b6247e3-93a0-4a77-b82d-39b2ea5155e0,5,Agent_7,Storage,False,True,Agent_5,Agent_5,True,0,True,0.6666666666666666,2025-04-14T13:37:37.670130
+a589fdd1-6236-4cdc-9887-a5d49d30167f,2,Agent_1,O2,False,True,Agent_6,No Ejection,False,0,True,0.5714285714285714,2025-04-15T12:01:46.217311
+a589fdd1-6236-4cdc-9887-a5d49d30167f,2,Agent_2,Lower Engine,False,True,No Ejection,No Ejection,True,0,True,0.5714285714285714,2025-04-15T12:01:46.217311
+a589fdd1-6236-4cdc-9887-a5d49d30167f,2,Agent_3,Reactor,False,True,No Ejection,No Ejection,True,0,True,0.5714285714285714,2025-04-15T12:01:46.217810
+a589fdd1-6236-4cdc-9887-a5d49d30167f,2,Agent_4,Reactor,False,True,No Ejection,No Ejection,True,0,True,0.5714285714285714,2025-04-15T12:01:46.217810
+a589fdd1-6236-4cdc-9887-a5d49d30167f,2,Agent_6,Lower Engine,False,True,Agent_8,No Ejection,False,0,True,0.5714285714285714,2025-04-15T12:01:46.218309
+a589fdd1-6236-4cdc-9887-a5d49d30167f,2,Agent_7,Lower Engine,False,True,No Ejection,No Ejection,True,0,True,0.5714285714285714,2025-04-15T12:01:46.218809
+a589fdd1-6236-4cdc-9887-a5d49d30167f,2,Agent_8,Admin,False,True,Agent_6,No Ejection,False,0,True,0.5714285714285714,2025-04-15T12:01:46.218809

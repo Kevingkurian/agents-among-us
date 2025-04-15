@@ -64,7 +64,7 @@ def log_game_event(game_id, round_id, agent_id, room, was_killed, vote_cast, vot
                "consensus_reached": consensus_reached,
                "agreement_level": agreement_level})
 
-def log_game_model_selection(game_id, selected_model):
+def log_game_model_selection(game_id, selected_model, victory_condition=None):
     write_csv("dim_game.csv",
-              ["game_id", "selected_model"],
-              {"game_id": game_id, "selected_model": selected_model})
+              ["game_id", "selected_model", "victory_condition"],
+              {"game_id": game_id, "selected_model": selected_model, "victory_condition": victory_condition or "Ongoing"})

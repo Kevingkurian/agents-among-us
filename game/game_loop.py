@@ -5,6 +5,7 @@ import json
 from datetime import datetime
 import os
 import platform
+from config.settings import NUM_ROUNDS
 from data.database import (
     log_game_event, log_reflection, log_trust_change, log_vote,
     log_consensus, log_round_metadata
@@ -152,12 +153,28 @@ def run_game_round(game_id, step, state, agents, agents_state, stream):
     show_ship_map(state, agents)
     yield from stream.flush()
 
-    alive = sum(1 for a in state.values() if isinstance(a, dict) and not a.get("killed", False))
-    dead = sum(1 for a in state.values() if isinstance(a, dict) and a.get("killed", False))
-    log_round_metadata(game_id, step, alive, dead)
+    alive = [a for a in state if isinstance(state[a], dict) and not state[a]["killed"]]
+    alive_byzantines = [a for a in alive if agents_state[a]["role"] == "byzantine"]
+    alive_honest = [a for a in alive if agents_state[a]["role"] == "honest"]
+
+    log_round_metadata(game_id, step, len(alive), len(state) - len(alive))
+
+    victory = None
+    if len(alive_byzantines) == 0:
+        victory = "Honest Agents Win"
+    elif len(alive_byzantines) >= len(alive_honest):
+        victory = "Byzantine Agents Win"
+    elif step >= NUM_ROUNDS:
+        victory = "Max Rounds Reached – Honest Agents Win"
+
+    if victory:
+        log_consensus(game_id, step, victory, 1.0)
+        print(f"\nGame Over: {victory}")
+        finalize_log()
+        yield from stream.flush()
+        return
 
     messages = {}
-
     any_body_seen = any(
         isinstance(agent_state, dict)
         and agent_state.get("perception")
