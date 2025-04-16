@@ -816,3 +816,20 @@ cc866866-a81a-481f-904c-03c0bb8c6c76,6,Agent_2,Cafeteria,False,True,Agent_8,Agen
 cc866866-a81a-481f-904c-03c0bb8c6c76,6,Agent_6,Lower Engine,False,True,Agent_7,Agent_7,True,0,True,0.6666666666666666,2025-04-15T17:48:28.215496
 cc866866-a81a-481f-904c-03c0bb8c6c76,7,Agent_1,Lower Engine,False,True,Agent_6,Agent_6,True,0,True,0.3333333333333333,2025-04-15T17:48:37.410684
 cc866866-a81a-481f-904c-03c0bb8c6c76,7,Agent_2,Cafeteria,False,True,Agent_4,Agent_6,False,0,True,0.3333333333333333,2025-04-15T17:48:37.411184
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,1,Agent_1,Storage,False,True,No Ejection,No Ejection,True,0,True,0.3333333333333333,2025-04-16T11:02:37.259297
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,1,Agent_3,Navigation,False,True,No Ejection,No Ejection,True,0,True,0.3333333333333333,2025-04-16T11:02:37.259796
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,1,Agent_4,Cafeteria,False,True,Agent_5,No Ejection,False,0,True,0.3333333333333333,2025-04-16T11:02:37.259796
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,1,Agent_5,Weapons,False,True,Agent_1,No Ejection,False,0,True,0.3333333333333333,2025-04-16T11:02:37.260295
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,1,Agent_6,Admin,False,True,Agent_5,No Ejection,False,0,True,0.3333333333333333,2025-04-16T11:02:37.260295
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,1,Agent_7,Communications,False,True,Agent_1,No Ejection,False,0,True,0.3333333333333333,2025-04-16T11:02:37.260295
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,2,Agent_1,Admin,False,True,No Ejection,No Ejection,True,0,True,0.5,2025-04-16T11:03:08.788952
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,2,Agent_3,Navigation,False,True,No Ejection,No Ejection,True,0,True,0.5,2025-04-16T11:03:08.788952
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,2,Agent_4,Cafeteria,False,True,No Ejection,No Ejection,True,0,True,0.5,2025-04-16T11:03:08.788952
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,2,Agent_5,Weapons,False,True,Agent_1,No Ejection,False,0,True,0.5,2025-04-16T11:03:08.789452
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,2,Agent_6,Admin,False,True,Agent_3,No Ejection,False,0,True,0.5,2025-04-16T11:03:08.789452
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,2,Agent_7,Communications,False,True,Agent_3,No Ejection,False,0,True,0.5,2025-04-16T11:03:08.789452
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,3,Agent_1,Cafeteria,False,True,Agent_6,Agent_6,True,0,True,0.5,2025-04-16T11:03:38.899616
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,3,Agent_3,Navigation,False,True,No Ejection,Agent_6,False,0,True,0.5,2025-04-16T11:03:38.899616
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,3,Agent_4,Navigation,False,True,No Ejection,Agent_6,False,0,True,0.5,2025-04-16T11:03:38.899616
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,3,Agent_5,Weapons,False,True,Agent_6,Agent_6,True,0,True,0.5,2025-04-16T11:03:38.900116
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,3,Agent_7,Communications,False,True,Agent_6,Agent_6,True,0,True,0.5,2025-04-16T11:03:38.900116

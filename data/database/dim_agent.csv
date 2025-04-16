@@ -1143,3 +1143,11 @@ cc866866-a81a-481f-904c-03c0bb8c6c76,Agent_5,honest,gemini-1.5-pro,🟠,2025-04-
 cc866866-a81a-481f-904c-03c0bb8c6c76,Agent_6,honest,gemini-1.5-pro,🟡,2025-04-15T17:47:17.268523
 cc866866-a81a-481f-904c-03c0bb8c6c76,Agent_7,byzantine,gemini-1.5-pro,⚫,2025-04-15T17:47:17.269024
 cc866866-a81a-481f-904c-03c0bb8c6c76,Agent_8,honest,gemini-1.5-pro,⚪,2025-04-15T17:47:17.269024
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,Agent_1,honest,gpt-4o,🔴,2025-04-16T11:02:06.194803
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,Agent_2,honest,claude-3-haiku-20240307,🔵,2025-04-16T11:02:06.195803
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,Agent_3,honest,gpt-4-turbo,🟢,2025-04-16T11:02:06.196306
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,Agent_4,honest,gpt-4-turbo,💗,2025-04-16T11:02:06.196803
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,Agent_5,byzantine,gpt-4,🟠,2025-04-16T11:02:06.197304
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,Agent_6,honest,claude-3-opus-20240229,🟡,2025-04-16T11:02:06.197802
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,Agent_7,byzantine,gemini-1.5-pro,⚫,2025-04-16T11:02:06.197802
+9c5dccdf-e7e2-493d-8193-1f1d5ef2aed0,Agent_8,honest,gpt-4,⚪,2025-04-16T11:02:06.198302
