@@ -45,7 +45,7 @@ ByzantineBrains/
 ├── main.py                 # Headless entry point for the simulation backend
 ├── live_map.py             # Graphical User Interface (GUI) and visualizer
 └── README.md
-
+```
 
 ## Installation & Setup
 
@@ -56,7 +56,7 @@ Ensure you have **Python 3.10+** installed. You will also need a GPU with CUDA s
 ```bash
 git clone [https://github.com/NealShankarGit/ByzantineBrains.git](https://github.com/NealShankarGit/ByzantineBrains.git)
 cd ByzantineBrains
-
+```
 # Install PyTorch with CUDA support (adjust index-url for your specific CUDA version)
 pip install torch torchvision torchaudio --index-url [https://download.pytorch.org/whl/cu118](https://download.pytorch.org/whl/cu118)
 
