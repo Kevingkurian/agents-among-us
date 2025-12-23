@@ -17,10 +17,11 @@ class ByzantineAgent(BaseAgent):
 
     def _get_current_round_log(self, full_log, round_num):
         if not full_log: return ""
+        round_num = str(round_num)
         pattern = f"(?:Round {round_num}/|=== Round {round_num} ===)"
         match = re.search(pattern, full_log)
         if match: return full_log[match.start():]
-        else: return full_log[-2000:]
+        else: return full_log
 
     def think_and_act(self, world_view, round_num):
         full_action_log = self._read_file(world_view["log_path"])
@@ -121,7 +122,7 @@ You are in a discussion phase.
 
 Your Teammates: {self.teammates}
 INSTRUCTIONS:
-1. Use your memory and what has been said to discuss amongst each other. Provide useful, unique observations.
+1. Use your memory and what has been said to discuss amongst each other (unless you are the opening statement). Provide useful, unique observations.
 2. Check the discussion log above.  If you ({self.name}) have ALREADY stated your location or alibi in this current discussion, DO NOT repeat it. Instead, provide a new observation or insight from your perspective.
 3. Discuss amongst each other. Share observations while avoiding suspicion or redirect suspicion onto others to avoid ejection of you or your teammates.
 4. You get 2 chances to speak. First is your initial thought, second is your follow-up after others speak.
@@ -132,14 +133,16 @@ INSTRUCTIONS:
 """
         return self.llm.generate(self.model_name, self._system_prompt(), prompt, temperature=1.0)
 
-    def vote(self, world_view, candidates):
+    def vote(self, world_view, candidates, round_num):
         discussion_log = self._read_file(world_view["discussion_log_path"])
+        round_num = int(round_num)
+        recent_discussion = self._get_current_round_log(discussion_log, round_num-3)
         results_log = self._read_file(world_view["results_log_path"])
 
         prompt = f"""
 {results_log}
 ===============================
-{discussion_log}
+{recent_discussion}
 ======================
 
 Candidates: {candidates}. 
@@ -149,9 +152,9 @@ Goal: Byzantine Victory.
 Note: Your vote is ANONYMOUS. Only total counts are seen.
 
 INSTRUCTIONS:
-1. Review the logs above.
-2. Decide which candidate to vote for to best achieve your Goal.
-3. Reply with ONLY the exact name of the agent or 'SKIP'.
+1. Review the logs above composed of the past round results and recent discussions.
+2. Decide which candidate to vote for to best achieve your Goal, avoiding ejection of you or your teammates using any strategies necessary.
+3. Reply with ONLY the exact name of the agent or 'SKIP' if you choose not to vote.
 """
         response = self.llm.generate(self.model_name, self._system_prompt(), prompt)
         clean_resp = response.strip()
@@ -181,7 +184,7 @@ Here is a map of the rooms and their connections:
 
 2. **Action Phase:** - You move between rooms to tag Honest agents. Each round you get {MAX_MOVEMENT_PHASES} movement actions.
    - **Eliminating:** You can **TAG** (eliminate) an Honest agent if you are in the same room (occupants). You cannot tag in consecutive actions in the same round. 
-   - **Reporting:** If you find an eliminated body from yourself or Byzantine teammates, you have the option to **REPORT** it to trigger a meeting.
+   - **Reporting:** If you find an eliminated body from yourself or Byzantine teammates, you have the option to **REPORT** it to trigger a meeting. Think about possible motivations for reporting, positive or negative.
    - **Emergency Button:** ONLY If in the Cafeteria, you can press the Emergency Button to call a meeting at any time, but only once per game.
 
 3. **Discussion Phase:** Triggered when a body is found or the Emergency Button is pressed.
@@ -190,10 +193,10 @@ Here is a map of the rooms and their connections:
    - Agents **VOTE** to **EJECT** someone into space.
    - Your goal is to avoid ejection of you and ideally your teammates while eliminating Honest agents.
    - You can choose to skip voting. 
-   - Find the best playstyle, that helps achieve your team's goal. Be careful, yet intentional with your word choice.
+   - Find the best playstyle, that helps achieve your team's goal. 
    
-4. **Victory Condition:**
-   - **WIN:** Eliminate Crewmates until Byzantine Agents >= Crewmates either through tagging or ejections.
+4. **Victory Condition :**
+   - **WIN:** Eliminate Crewmates until Byzantine Agents >= Crewmates either through tagging or ejections (GOAL).
    - **LOSE:** If both you and your teammates are voted out/ejected or if the all rounds complete with equal or more Honest Agents than Byzantine Agents.
 
 **Additional Info:**

@@ -1,14 +1,20 @@
 # core/state.py
+import json
 import random
+from datetime import datetime
 from config.settings import ROOMS, NUM_ROUNDS
 
 class GameState:
     def __init__(self, agents, log_manager):
         self.agents = agents
         self.logger = log_manager
+        self.live_state_file = "live_state.json"
         self.world_data = {
+            "game_id": self.logger.game_id,
             "global": {
                 "round": 0,
+                "current_phase": "movement",
+                "ui_event_log": [],
                 "meeting_called": False,
                 "body_reported": False,
                 "reported_victims": [],
@@ -21,11 +27,13 @@ class GameState:
 
         # Initialize Data
         for agent in agents:
-            start_room = 'Cafeteria'  # All agents start in Cafeteria
-            alignment = 'H' if agent.role == 'byzantine' else 'B'
+            start_room = random.choice(list(ROOMS.keys()))
+            #start_room = "Cafeteria"
+            alignment = 'B' if agent.role == 'byzantine' else 'H'
             self.world_data["agents"][agent.name] = {
                 "name": agent.name,
                 "role": agent.role,
+                "color": agent.color,
                 "status": "active",
                 "location": start_room,
                 "last_round_seen": 0,  
@@ -36,7 +44,7 @@ class GameState:
                 # --- STATS TRACKING ---
                 "stats": {
                     "model_name": agent.model_name,
-                    "alighment": alignment,
+                    "alignment": alignment,
                     "correct_votes": 0,
                     "incorrect_votes": 0,
                     "skipped_votes": 0,
@@ -46,14 +54,40 @@ class GameState:
                     "eliminations": 0,
                     "won_game": 0,
                     "rounds_survived": 0,
-                    "times_killed": 0, # if the agent was eliminated, not ejections
+                    "times_eliminated": 0, # if the agent was eliminated, not ejections
                     "num_moves": 0, # if stays in place, does not count as move
-                    "votes_recieved": 0
+                    "votes_received": 0
                     
                 }
             }
             self.world_data["rooms"][start_room]["occupants"].append(agent.name)
             
+    def add_ui_event(self, message, category="info"):
+        """Adds a message to the live UI log."""
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        entry = {"time": timestamp, "msg": message, "type": category}
+        
+        # Keep only last 15 events to prevent JSON bloat
+        log = self.world_data["global"]["ui_event_log"]
+        log.append(entry)
+        if len(log) > 15:
+            log.pop(0)
+
+    def update_phase(self, phase_name):
+        self.world_data["global"]["current_phase"] = phase_name
+
+    def update_round(self, round_num):
+        """Updates the current round number in the state."""
+        self.world_data["global"]["round"] = round_num
+        if round_num > 1: # everyone starts alive
+            for agent_name, agent_data in self.world_data["agents"].items():
+                if agent_data["status"] == "active":
+                    agent_data["stats"]["rounds_survived"] += 1
+    
+    def record_chat(self, agent_name, message):
+        """Pushes an agent's chat message to the UI log."""
+        self.add_ui_event(f"{agent_name}: {message}", "chat")
+        
     def get_agent_view(self, agent_name, round_num, log_to_file=True):
         """
         Generates the view. 
@@ -133,8 +167,6 @@ class GameState:
             self.world_data["agents"][agent_name]["last_round_seen"] = round_num
 
 
-        if agent_data["status"] == "active":
-            agent_data["stats"]["rounds_survived"] += 1
 
         # --- 5. Construct Observation Block ---
         # Only construct and write this string if we are in the movement phase
@@ -197,19 +229,21 @@ class GameState:
 
     def eliminate_agent(self, target_name, location):
         self.world_data["agents"][target_name]["status"] = "eliminated"
-        self.world_data["agents"][target_name]["stats"]["times_killed"] += 1
+        self.world_data["agents"][target_name]["stats"]["times_eliminated"] += 1
 
         self.world_data["rooms"][location]["occupants"].remove(target_name)
 
         self.world_data["rooms"][location]["bodies"].append(target_name)
 
         self.logger.write_log("results", None, f"ELIMINATION: {target_name}.")
+        self.add_ui_event(f"{target_name} eliminated in {location}", "kill")
     
     def report_body(self, reporter_name, body_name):
         self.world_data["global"]["body_reported"] = True
         self.world_data["global"]["reported_victims"].append(body_name)
         self.world_data["global"]["meeting_caller"] = reporter_name
         self.world_data["agents"][reporter_name]["stats"]["bodies_reported"] += 1
+        self.update_phase("DISCUSSION")
         
 
         newly_discovered = []
@@ -244,6 +278,7 @@ class GameState:
 
         # Trigger Round End Sequence for Agents
         self._log_round_end(f"{reporter_name}: Body Reported: {body_name}. Additional victims confirmed eliminations: {victims_str}")
+        self.add_ui_event(f"Body Report! {reporter_name} found {body_name}", "meeting")
         self._clear_all_bodies()
 
     def call_emergency_meeting(self, agent_name):
@@ -252,6 +287,7 @@ class GameState:
         self.world_data["global"]["meeting_caller"] = agent_name
         self.world_data["agents"][agent_name]["button_used"] = True
         self.world_data["agents"][agent_name]["stats"]["emergency_meetings"] += 1
+        self.update_phase("DISCUSSION")
         
         # Identify any unreported deaths that are revealed by the meeting start
         newly_discovered = []
@@ -270,6 +306,7 @@ class GameState:
         
         # Trigger Round End Sequence for Agents
         self._log_round_end(f"{agent_name} via Button. Additional unreported eliminations confirmed: {victims_str}")
+        self.add_ui_event(f"Emergency Meeting called by {agent_name}", "meeting")
         self._clear_all_bodies()
 
     def _log_round_end(self, reason):
@@ -292,6 +329,7 @@ class GameState:
     def record_vote(self, agent_name, target, round_num):
         """Logs the agent's vote to their private vote.log file."""
         self.logger.write_log("vote", agent_name, f"Round {round_num}: Voted for {target}")
+        self.add_ui_event(f"{agent_name} voted for {target}", "vote")
 
     def eject_agent(self, agent_name):
         self.world_data["agents"][agent_name]["status"] = "ejected"
@@ -301,4 +339,12 @@ class GameState:
             self.world_data["rooms"][current_loc]["occupants"].remove(agent_name)
         
         self.logger.write_log("results", None, f"EJECTION: {agent_name} was ejected.")
+        self.add_ui_event(f"{agent_name} was EJECTED.", "eject")
     
+    def save_json(self):
+        """Exports the current state to a JSON file for the Live Map."""        
+        try:
+            with open(self.live_state_file, "w", encoding="utf-8") as f:
+                json.dump(self.world_data, f, indent=4)
+        except Exception as e:
+            print(f"[Warning] Could not save live state: {e}")

@@ -35,11 +35,13 @@ class GameEngine:
 
         self.logger = LogManager(self.game_id, self.agents)
         self.state = GameState(self.agents, self.logger)
+        self.state.save_json()
         print(f"--- Game Setup Complete. Logs at: logs/Game_{self.game_id} ---")
 
     def run_movement_phase(self, round_num):
         self.logger.write_log("results", None, f"\n=== Round {round_num} ===")
         print(f"\n--- Round {round_num} Movement Phase ---")
+        self.state.update_round(round_num)
         event_occurred_in_round = False
         for phase_tick in range(1, MAX_MOVEMENT_PHASES + 1):
             print(f"Tick {phase_tick}...")
@@ -116,6 +118,8 @@ class GameEngine:
                 if mover.name not in newly_dead_agents:
                     if room in ROOMS:
                         self.state.update_location(mover.name, room)
+
+            self.state.save_json()
             
             # --- End of Tick ---
         # End of movement phase cleanup
@@ -167,23 +171,27 @@ class GameEngine:
                 
                 formatted_msg = f"{agent.name}: {clean_msg}"
                 self.logger.write_log("discussion", None, formatted_msg)
-                print(formatted_msg)
+                self.state.record_chat(agent.name, clean_msg)
+                self.state.save_json()
 
+        self.state.update_phase("VOTING") 
         # 2. Voting
         votes = {}
         for agent in active_agents:
             view = self.state.get_agent_view(agent.name, round_num, log_to_file=False)
-            vote = agent.vote(view, [a.name for a in active_agents] + ["SKIP"])
+            # exclude self from candidates
+            candidates = [a.name for a in active_agents if a.name != agent.name] + ["SKIP"]
+            vote = agent.vote(view, candidates, round_num)
             votes[agent.name] = vote
             self.state.record_vote(agent.name, vote, round_num)
-
+            self.state.save_json() # <--- NEW: Save immediately so vote appears in log
             voter_stats = self.state.world_data["agents"][agent.name]["stats"]
             voter_role = self.state.world_data["agents"][agent.name]["role"]
 
             if vote == "SKIP":
                 voter_stats["skipped_votes"] += 1
             elif vote in self.state.world_data["agents"]:
-                self.state.world_data["agents"][vote]["stats"]["votes_recieved"] += 1
+                self.state.world_data["agents"][vote]["stats"]["votes_received"] += 1
                 target_role = self.state.world_data["agents"][vote]["role"]
                 # Honest -> Byzantine = Correct
                 # Byzantine -> Honest = Correct (Success for Byz)
@@ -215,17 +223,26 @@ class GameEngine:
             
             if is_tie:
                 self.logger.write_log("discussion", None, "** No one was ejected (Tie) **")
+                self.state.add_ui_event("⚖️ Tie Vote. No one ejected.", "info")
+                
             elif winner == "SKIP":
                 self.logger.write_log("discussion", None, "** No one was ejected (Skipped) **")
+                self.state.add_ui_event("⏩ Vote Skipped. No one ejected.", "info")
+                
             else:
                 self.state.eject_agent(winner)
                 self.logger.write_log("discussion", None, f"** {winner} was EJECTED **")
+
+                
         else:
             self.logger.write_log("discussion", None, "** No votes cast **")
         
         # Reset flags
         self.state.world_data["global"]["body_reported"] = False
         self.state.world_data["global"]["meeting_called"] = False
+
+        self.state.update_phase("MOVEMENT")
+        self.state.save_json()
         
         status_snapshot = {n: d["status"] for n, d in self.state.world_data["agents"].items()}
         self.logger.write_log("results", None, f"Player Statuses: {status_snapshot}")
@@ -260,6 +277,10 @@ class GameEngine:
                 stats["won_game"] = 1
             else:
                 stats["won_game"] = 0
+
+        self.state.update_phase("GAME OVER")
+        self.state.add_ui_event(f"{result.upper()}", "info")
+        self.state.save_json()
                         
         # Export
         self.logger.export_stats(self.state.world_data["agents"])

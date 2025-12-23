@@ -35,15 +35,14 @@ def main():
             # Run Discussion
             engine.run_discussion_phase(round_num)
             
-            # Check 2: Did anyone get ejected?
-            # (Only need to check this if a discussion actually happened)
             final_result = engine.check_win_condition()
             if final_result:
                 break
         time.sleep(1)
 
     if not final_result:
-        final_result = "Honest Agents Win, Max Rounds Reached" 
+        final_result = "Honest Agents Win, Max Rounds Reached"
+        engine.finalize_stats(final_result) 
     print(f"Game Over. Result: {final_result}")
 
 if __name__ == "__main__":

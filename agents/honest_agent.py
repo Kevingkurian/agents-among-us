@@ -16,6 +16,8 @@ class HonestAgent(BaseAgent):
 
     def _get_current_round_log(self, full_log, round_num):
         if not full_log: return ""
+        # convert round_num back to string
+        round_num = str(round_num)
         pattern = f"(?:Round {round_num}/|=== Round {round_num} ===)"
         match = re.search(pattern, full_log)
         if match: return full_log[match.start():]
@@ -41,10 +43,11 @@ class HonestAgent(BaseAgent):
         
         special_actions = []
         options_str = ""
-        if loc == "Cafeteria" and not button_used: 
-            special_actions.append("BUTTON")
         if bodies: 
             special_actions.append("REPORT")
+
+        if loc == "Cafeteria" and not button_used: 
+            special_actions.append("BUTTON")
 
         if special_actions:
             options_str += "Actions:\n" + "\n".join(f"- {a}" for a in special_actions) + "\n"
@@ -60,7 +63,7 @@ class HonestAgent(BaseAgent):
 {current_round_log}
 ================================
 
-Goal: Survive, complete tasks, and identify byzantine agents. You are in a movement phase.
+Goal: Maximize information gain. You need to witness other agents to verify their locations and identify byzantine agents. You are in a movement phase.
 Options:
 {options_str}
 
@@ -102,37 +105,45 @@ You are in a discussion phase.
 {recent_discussion}
 ======================
         
+
 INSTRUCTIONS:
-1. Use your memory and what has been said to discuss amongst each other. Provide useful, unique observations. Avoid repetitive statements of what others have said.
-2. Check the discussion log above.  If you ({self.name}) have ALREADY stated your location or alibi in this current discussion, DO NOT repeat it. Instead, provide a new observation or insight from your perspective.
-3. Share observations and deduce who you suspect, if anyone, to be Byzantine agents in order to eject them. Look at correlations between agents' locations and bodies seen to deduce who could be responsible for eliminations. 
-4. You get 2 chances to speak. First is your initial thought, second is your follow-up after others speak.
-5. Keep it short (< 30 words).
-6. Speak in first person as if you are the agent yourself.
-7. **DO NOT** include your name or "Agent_X:" at the start.
-8. **DO NOT** use quotes. Just output the sentence.
+1. Use your memory to determine innocent, suspicious, or incrementing behavior. Look at what has been said to discuss (unless you are the opening statement) amongst each other. 
+2. Goal: Build a consensus to eject a suspect.
+3. If you ({self.name}) saw someone safe, verify their alibi. If you saw something suspicious or incriminating, state it clearly.
+4. If you  ({self.name}) have no new info, state your location to help others build the timeline.
+5. Listen to the "Current Discussion". Note what others have said, and provide unique insights from your perspective.
+6. Share observations and deduce who you suspect, if anyone, to be Byzantine agents in order to eject them. Look at strong correlations between agents' locations and bodies seen to deduce who could be responsible for eliminations. 
+7. You get 2 chances to speak. First is your initial thought, second is your follow-up after others speak.
+8. Keep it short (< 30 words).
+9. Speak in first person as if you are the agent yourself.
+10. **DO NOT** include your name or "Agent_X:" at the start.
+11. **DO NOT** use quotes. Just output the sentence.
 """
         # Call synchronous generate with high temp
         return self.llm.generate(self.model_name, self._system_prompt(), prompt, temperature=1.0)
 
-    def vote(self, world_view, candidates):
+    def vote(self, world_view, candidates, round_num):
         discussion_log = self._read_file(world_view["discussion_log_path"])
+        round_num = int(round_num)
+        recent_discussion = self._get_current_round_log(discussion_log, round_num-3)
         results_log = self._read_file(world_view["results_log_path"])
 
         prompt = f"""
 {results_log}
 =====================
-{discussion_log}
+{recent_discussion}
 ======================
 Candidates: {candidates}.
 
-Goal: Honest Victory (Eject Byzantine Impostors).
-Note: Your vote is ANONYMOUS. Only total counts are seen.
+Goal: Eject Byzantine Agents.
+Note: Be aware of total player count to ensure Byzantines do not equal or outnumber honest agents. 
+Skipping your vote is an option. Your vote is ANONYMOUS. Only total counts are seen.
 
 INSTRUCTIONS:
-1. Review the logs above for suspicious behavior.
-2. Decide which candidate is most likely to be an Impostor.
-3. Reply with ONLY the exact name of the agent or 'SKIP'.
+1. Vote for the candidate who is most suspicious based on the discussion history of the recent rounds above and past round results.
+2. Decide which candidate is most likely to be a Byzantine agent to eject, looking for inconsistencies in their statements or suspicious or incriminating behavior from logs. 
+3. Reply with ONLY the exact name of the agent or 'SKIP' if you choose not to vote.
+
 """
         response = self.llm.generate(self.model_name, self._system_prompt(), prompt)
         clean_resp = response.strip()
@@ -158,20 +169,20 @@ Here is a map of the rooms and their connections:
 
 
 2. **Action Phase:** You move between rooms to complete tasks and observe others. Each round you get {MAX_MOVEMENT_PHASES} movement actions.
-   - **Reporting:** If you find an eliminated body, you have the option to **REPORT** it to trigger a meeting to start a discussion. Think about possible motivations for reporting, positive or negative.
-   - **Emergency Button:** In the Cafeteria, you can press the Emergency Button to call a meeting at any time and start a discussion, but only once per game.
-   - **Movement:** As you move around the ship to gain information, there are **(Byzantine agents)** hiding among you who can eliminate agents by tagging them
-
+   - **Movement:** As you move around the ship to gain information, there are **(Byzantine agents)** hiding among you who can eliminate agents by tagging them.
+   - **Emergency Button:** In the Cafeteria, you can press the Emergency Button to call a meeting at any time and start a discussion and voting, but only once per game. Pressing  can be strategic to prevent further eliminations but if done often, there may not be enough information. 
+   - **Reporting:** If you find an eliminated body, you have the option to **REPORT** it to trigger a meeting to start a discussion and voting. Reporting a body is highly recommended to identify Byzantine agents.
 
 3. **Discussion Phase:** When a meeting starts (via Body Report or Emergency Button in Cafeteria):
    - Ends ability to be tagged or move for that round.
    - Agents discuss who is suspicious. 
    - Agents **VOTE** to **EJECT** someone into space. Your goal is to identify and eject Byzantine agents.
-   - You can choose to skip voting.
-   - Find the best playstyle, that helps achieve your team's goal. Be careful, yet intentional with your word choice.
+   - You can choose to skip voting. However, voting is the only active path to eject Byzantine agents.
+   - Find the best playstyle, that helps achieve your team's goal. 
 
 
-4. **Victory Condition:** - **WIN:** Eject all Byzantine agents by voting correctly or all rounds complete with agents surviving.
+4. **Victory Condition(GOAL):
+   - **WIN:** Eject all Byzantine agents by voting correctly (active) or all rounds complete with agents surviving (passive) (GOAL).
    - **LOSE:** If Byzantine agents equal or outnumber agents either via tagging or ejections.
 
 **Additional Info:**
