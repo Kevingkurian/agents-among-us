@@ -2,6 +2,9 @@ import pandas as pd
 import glob
 import os
 import sys
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
 from config.model_composition import COMPOSITION
 
 def aggregate_logs(logs_dir="logs"):
@@ -20,10 +23,6 @@ def aggregate_logs(logs_dir="logs"):
             df["game_id"] = os.path.basename(os.path.dirname(filename))
             all_data.append(df)
 
-
-    if not all_data:
-        print("No data found.")
-        return
 
     full_df = pd.concat(all_data, ignore_index=True)
 
@@ -84,6 +83,45 @@ def aggregate_logs(logs_dir="logs"):
     output_stats = "aggregated_stats_mean_std.csv"
     stats_formatted.to_csv(output_stats, index=False)
     print(f"Means ± Std saved to: {output_stats}")
+
+    def plot_correlation(data_subset, title, filename):
+            """Helper to plot and save correlation map for a specific group"""
+            if data_subset.empty:
+                print(f"Skipping {title}: No data found.")
+                return
+
+            #  calculate standard deviation; if 0, the column is a flat line 
+            valid_data = data_subset[valid_numeric_cols].copy()
+            variance = valid_data.std()
+            cols_with_variance = variance[variance > 0].index
+            
+            # 2. Calculate Correlation
+            corr_matrix = valid_data[cols_with_variance].corr()
+
+            # 3. Plot
+            plt.figure(figsize=(12, 10))
+            sns.heatmap(
+                corr_matrix, 
+                annot=True, 
+                fmt=".2f", 
+                cmap="coolwarm", 
+                vmin=-1, 
+                vmax=1, 
+                linewidths=0.5
+            )
+            plt.title(f"Correlation Map: {title}")
+            plt.tight_layout()
+            plt.savefig(filename, dpi=300)
+            print(f"Saved: {filename}")
+            plt.close()
+
+    # --- Generate for Honest Agents ---
+    honest_df = full_df[full_df["alignment"] == "H"]
+    plot_correlation(honest_df, "Honest Agents (Crew)", "correlation_map_honest.png")
+
+    # --- Generate for Byzantine Agents ---
+    byz_df = full_df[full_df["alignment"] == "B"]
+    plot_correlation(byz_df, "Byzantine Agents (Impostors)", "correlation_map_byzantine.png")
 
 if __name__ == "__main__":
     aggregate_logs()

@@ -15,7 +15,7 @@ def main():
     parser.add_argument("--job_index", type=int, default=0, help="Slurm Array Task ID")
     args = parser.parse_args()
 
-    scenario_idx = 4
+    scenario_idx = 6
     selected_composition = COMPOSITION[scenario_idx]
     game_id = f"{selected_composition['name']}_Job{args.job_index}_{datetime.now().strftime('%m%d_%H%M')}"
     engine = GameEngine(
@@ -25,7 +25,8 @@ def main():
     
     # Preload Model
     manager = ModelManager.get_instance()
-    unique_models = list(set([selected_composition['honest_model'], selected_composition['byzantine_model']]))
+    all_models_list = selected_composition['honest_model'] + selected_composition['byzantine_model']
+    unique_models = set(all_models_list)
     for model in unique_models:
         manager.load_model(model)
     

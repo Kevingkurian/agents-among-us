@@ -16,31 +16,38 @@ class GameEngine:
         self.logger = None
 
     def setup(self, composition):
-        honest_model = composition["honest_model"]
-        byz_model = composition["byzantine_model"]
+        honest_models = composition["honest_model"]
+        byz_models = composition["byzantine_model"]
         n_honest = composition["honest_count"]
         n_byz = composition["byzantine_count"]
+        
         colors = ["🔴", "🔵", "🟢", "💗", "🟠", "🟡", "⚫", "⚪", "🟣", "🟤"]
-
+        
+        # 1. Create Byzantine Agents
         byz_names = [f"Agent_{i}" for i in range(n_byz)]
         for i, name in enumerate(byz_names):
-            # Pass the byzantine specific model
+            # CYCLE through the list of models using modulo
+            # Works for list of size 1 or size 100
+            assigned_model = byz_models[i % len(byz_models)]
+            
             teammates = [b for b in byz_names if b != name]
             self.agents.append(
-                ByzantineAgent(name, colors[i], teammates, byz_model)
+                ByzantineAgent(name, colors[i], teammates, assigned_model)
             )
-            
-        # Start naming after the last byzantine agent
+
+        # 2. Create Honest Agents
         start_index = n_byz 
         for i in range(n_honest):
             name = f"Agent_{start_index + i}"
             color = colors[(start_index + i) % len(colors)]
-            # Pass the honest specific model
+            
+            # CYCLE through the list of models using modulo
+            assigned_model = honest_models[i % len(honest_models)]
+            
             self.agents.append(
-                HonestAgent(name, color, honest_model)
+                HonestAgent(name, color, assigned_model)
             )
 
-        # Shuffle agents list so turn order is random
         random.shuffle(self.agents)
 
         self.logger = LogManager(self.game_id, self.agents)
